@@ -5,10 +5,15 @@ let client: Anthropic | null = null;
 export function getAnthropicClient(): Anthropic {
   if (!client) {
     const apiKey = process.env.ANTHROPIC_API_KEY;
-    if (!apiKey) {
-      throw new Error("ANTHROPIC_API_KEY is not set.");
+    const authToken = process.env.ANTHROPIC_AUTH_TOKEN;
+
+    if (!apiKey && !authToken) {
+      throw new Error("Neither ANTHROPIC_API_KEY nor ANTHROPIC_AUTH_TOKEN is set.");
     }
-    client = new Anthropic({ apiKey });
+
+    client = authToken
+      ? new Anthropic({ authToken })
+      : new Anthropic({ apiKey: apiKey! });
   }
   return client;
 }
